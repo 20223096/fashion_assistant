@@ -58,11 +58,12 @@ const VB = { w: 240, h: 508 };
 /** 넥라인보다 아래로 앵커를 내림 → 상의와 더 겹침(얼굴은 SVG 아래·상의가 위) */
 const FACE_EXTRA_DOWN_VB = 32;
 
-/** 긴바지: 허리에서 발목까지 두 다리 실루엣.
- *  와이드·카고 느낌을 살리기 위해 바깥쪽만 넉넉하게 넓히고
- *  두 다리 사이(가랑이·발목 내측) 간격은 오히려 더 좁게 유지. */
+/** 긴바지: 허리~발목까지 **한 덩어리** 실루엣.
+ *  예전 PATH 는 두 다리 사이에 좁은 가랑이(플랫레이 한 장 이미지의 중앙·허벅지)를
+ *  clip 밖으로 빼서, 세로로 찢어진 것처럼 보이는 문제가 있었음.
+ *  플랫레이 PNG 는 가랑이 구멍이 없으므로, clip 도 단일 영역으로 맞춤. */
 const PATH_LEGS =
-  "M78 224 Q78 214 88 212 L152 212 Q162 214 162 224 L178 458 L125 466 L122 238 L118 238 L115 466 L62 458 Z";
+  "M70 220 Q70 206 82 200 L158 200 Q170 206 170 220 L182 454 L120 462 L58 454 Z";
 
 /** 반바지: 허리~허벅지 중간까지의 사다리꼴 (기장 짧음, 가로는 긴바지와 비슷하게 넉넉) */
 const PATH_SHORTS =
@@ -134,6 +135,11 @@ type GarmentSlot = {
   /** flat lay 사진에서 어느 쪽을 몸에 맞출지 */
   preserveAspectRatio: string;
   opacity?: number;
+  /**
+   * false: 상의 등 얼굴·머리 위에 올릴 때 drop-shadow 가 반투명 경계와 섞여
+   * 흰 막처럼 보이는 경우가 있어 상의만 끔.
+   */
+  dropShadow?: boolean;
 };
 
 function GarmentImage({
@@ -146,6 +152,11 @@ function GarmentImage({
   const { clipPathId, x, y, width, height, preserveAspectRatio, opacity } =
     slot;
 
+  const shadowClass =
+    slot.dropShadow === false
+      ? undefined
+      : "drop-shadow-[0_2px_6px_rgba(0,0,0,0.2)]";
+
   return (
     <image
       href={href}
@@ -155,7 +166,7 @@ function GarmentImage({
       height={height}
       preserveAspectRatio={preserveAspectRatio}
       {...(clipPathId ? { clipPath: `url(#${clipPathId})` } : {})}
-      className="drop-shadow-[0_2px_6px_rgba(0,0,0,0.2)]"
+      {...(shadowClass ? { className: shadowClass } : {})}
       style={{ opacity: opacity ?? 1 }}
     />
   );
@@ -272,7 +283,7 @@ export function MannequinLayers({
    *   - y(허리 시작)는 서브타입 관계없이 210 으로 고정 → 상의 하단과 맞물리는 라인이 일정
    *   - height 는 subtype 의 실제 기장 비율을 반영 (pants 100% ~ tennis_skirt ~55%)
    *   - width 는 실루엣이 퍼지는 정도(스커트 > 테니스스커트 > 긴바지 > 반바지) 를 반영
-   *   - clip 은 실제 실루엣과 가장 비슷한 path 를 사용 (긴바지만 양 다리 분리)
+   *   - clip 은 실제 실루엣과 가장 비슷한 path (긴바지는 플랫레이용 단일 실루엣)
    *   - preserveAspectRatio 는 언제나 `xMidYMin meet` → 원본 비율 유지 + 허리 라인 상단 정렬
    *     이렇게 해야 원본이 어떤 비율이든 세로로 과하게 늘어나지 않습니다.
    */
@@ -361,6 +372,7 @@ export function MannequinLayers({
         height: TOP_H,
         /** 상의 좌우 여백을 유지하면서 어깨선에 맞춤 */
         preserveAspectRatio: "xMidYMin meet",
+        dropShadow: false,
       },
     });
   }

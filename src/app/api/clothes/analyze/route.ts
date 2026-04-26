@@ -9,6 +9,7 @@ import {
   refineBboxForGarmentCrop,
 } from "@/lib/image-crop";
 import { tryCutoutGarmentByBgColor } from "@/lib/garment-cutout";
+import { cleanGarmentCutoutAlpha } from "@/lib/garment-alpha-clean";
 import { removeGarmentBackground } from "@/lib/garment-segmentation";
 import { normalizeUploadImage } from "@/lib/normalize-upload-image";
 import { analyzeClothingImageBase64 } from "@/lib/vision";
@@ -130,7 +131,12 @@ async function analyzeAndInsertOne(
       }
     }
     if (cutout) {
-      uploadBuf = cutout;
+      const debugId = `${userId.slice(0, 8)}-${item.category}-${crypto.randomUUID().slice(0, 8)}`;
+      const { buffer: cleaned } = await cleanGarmentCutoutAlpha(cutout, {
+        debugId,
+        category: item.category,
+      });
+      uploadBuf = cleaned;
       outMime = "image/png";
     }
     // cutoutSource 는 렌더링에서 fallback 인지 AI 세그먼트인지 구분해서

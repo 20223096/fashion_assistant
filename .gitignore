@@ -20,6 +20,9 @@
 # production
 /build
 
+# garment cutout debug dumps (DEBUG_GARMENT_CUTOUT=1)
+/tmp/cutout-debug/
+
 # misc
 .DS_Store
 *.pem
