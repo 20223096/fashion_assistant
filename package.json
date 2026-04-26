@@ -1,19 +1,44 @@
 {
-  "name": "fashion_assistant",
+  "name": "my-closet",
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "bash -c 'ulimit -n 65536 && next dev'",
+    "dev:clean": "bash -c 'ulimit -n 65536 && rm -rf .next && next dev'",
+    "dev:lan": "bash -c 'ulimit -n 65536 && next dev -H 0.0.0.0'",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "start:lan": "bash -c 'ulimit -n 65536 && next start -H 0.0.0.0'",
+    "prod:lan": "bash -c 'ulimit -n 65536 && next build && next start -H 0.0.0.0'",
+    "lint": "eslint",
+    "ios:add": "test -d ios || cap add ios; npm run ios:plist",
+    "ios:plist": "bash scripts/ios-plist-setup.sh",
+    "ios:sync": "cap sync ios",
+    "ios:open": "cap open ios",
+    "ios:run": "cap run ios",
+    "ios:dev": "echo '▶ 1) 다른 터미널에서: npm run dev:lan' && echo '▶ 2) 맥의 LAN IP 확인: ipconfig getifaddr en0' && echo '▶ 3) CAPACITOR_SERVER_URL=http://<맥IP>:3000 npm run ios:sync && npm run ios:open'"
   },
   "dependencies": {
+    "@capacitor/app": "^8.1.0",
+    "@capacitor/camera": "^8.1.0",
+    "@capacitor/core": "^8.3.1",
+    "@capacitor/haptics": "^8.0.2",
+    "@capacitor/ios": "^8.3.1",
+    "@capacitor/preferences": "^8.0.1",
+    "@capacitor/splash-screen": "^8.0.1",
+    "@capacitor/status-bar": "^8.0.2",
+    "@imgly/background-removal-node": "^1.4.5",
+    "@supabase/ssr": "^0.10.0",
+    "@supabase/supabase-js": "^2.101.1",
     "next": "16.2.2",
+    "openai": "^6.33.0",
     "react": "19.2.4",
-    "react-dom": "19.2.4"
+    "react-dom": "19.2.4",
+    "sharp": "^0.34.5",
+    "zod": "^4.3.6"
   },
   "devDependencies": {
+    "@capacitor/cli": "^8.3.1",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/react": "^19",

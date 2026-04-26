@@ -3,6 +3,25 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
+  /* iOS safe-area 대응용. Capacitor WebView에서 노치·홈 인디케이터 영역을 피하기 위해 사용. */
+  --safe-area-top: env(safe-area-inset-top, 0px);
+  --safe-area-right: env(safe-area-inset-right, 0px);
+  --safe-area-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-area-left: env(safe-area-inset-left, 0px);
+}
+
+html,
+body {
+  /* iOS WebView에서 좌우 바운스/가로 스크롤 방지 */
+  overscroll-behavior-x: none;
+  -webkit-text-size-adjust: 100%;
+}
+
+/* iOS Safari/WKWebView에서 input/textarea 포커스 시 자동 줌 방지 */
+input,
+select,
+textarea {
+  font-size: 16px;
 }
 
 @theme inline {
